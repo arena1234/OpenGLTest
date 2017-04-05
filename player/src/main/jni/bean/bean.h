@@ -4,7 +4,6 @@
 #include <GLES3/gl3.h>
 #include "transform/transform.h"
 #include "bean/bean_base.h"
-#include "gl/gl_picture.h"
 #include "log.h"
 
 class Bean {

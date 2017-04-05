@@ -14,6 +14,7 @@ LOCAL_SRC_FILES     :=  file/file.cpp               \
                         gl/gl_matrix.cpp            \
                         gl/gl_base.cpp              \
                         gl/gl_picture.cpp           \
+                        gl/gl_pic_light.cpp         \
                         gl/gl_video.cpp             \
                         bean/bean.cpp               \
                         bean/region.cpp             \

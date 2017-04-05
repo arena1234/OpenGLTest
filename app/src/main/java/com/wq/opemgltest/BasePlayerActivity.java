@@ -166,7 +166,7 @@ public class BasePlayerActivity extends BaseActivity implements
 
     private void setPlayerCtrlVisibility(boolean visibility) {
         if (visibility) {
-            mUIManager.show();
+//            mUIManager.show();
             sendMsg(MSG_DRAW_PLAYER_CTRL_HIDE, 3000);
         } else {
             mUIManager.hide();

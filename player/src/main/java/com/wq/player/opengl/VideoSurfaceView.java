@@ -37,10 +37,10 @@ public class VideoSurfaceView extends GLSurfaceView {
         mPicLeft = new NdkPicture(pictureMode);
         isPictureMode = pictureMode;
 
-        initEGL(false, 0, 0);
+        //initEGL(false, 0, 0);
 
         mRenderer = new VideoRenderer();
-        //setEGLContextClientVersion(3);
+        setEGLContextClientVersion(3);
         setRenderer(mRenderer);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }

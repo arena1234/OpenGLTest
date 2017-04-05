@@ -53,7 +53,7 @@ void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeInitApi(JNIEnv *env,
     mTransform = new Transform(mBean->getTransformBean());
     mBitmap = new Bitmap();
     if (pictureMode) {
-        mGLBase = new Picture(mBean->getTransformBean());
+        mGLBase = new PicLight(mBean->getTransformBean());
     } else {
         mGLBase = new Video(mBean->getTransformBean());
     }

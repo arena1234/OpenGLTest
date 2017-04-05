@@ -21,7 +21,13 @@ void Video::updateTexCoord() {
 }
 
 GLuint Video::loadShader() {
-    return createProgram(gVideoVertexShader, gVideoFragmentShader);
+    GLuint shaderHandle = createProgram(gVideoVertexShader, gVideoFragmentShader);
+
+    // 获取投影、Camera、变换句柄
+    mProjectionHandle = glGetUniformLocation(shaderHandle, "projection");
+    mCameraHandle = glGetUniformLocation(shaderHandle, "camera");
+    mTransformHandle = glGetUniformLocation(shaderHandle, "transform");
+    return shaderHandle;
 }
 
 void Video::createTexture() {

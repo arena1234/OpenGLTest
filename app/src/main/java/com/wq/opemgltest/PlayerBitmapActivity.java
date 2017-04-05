@@ -24,13 +24,6 @@ public class PlayerBitmapActivity extends BasePlayerActivity {
     }
 
     int bmpCount = 0;
-    int[] id = {
-            R.drawable.img_1,
-            R.drawable.img_2,
-            R.drawable.img_3,
-            R.drawable.img_4,
-            R.drawable.img_5,
-    };
     private static final int MSG_PAUSE_REFRESH_FRAME = 1;
     Handler mRefreshHandler = new Handler() {
         @Override

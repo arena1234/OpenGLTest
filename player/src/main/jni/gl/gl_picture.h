@@ -5,35 +5,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <bean/bean_base.h>
 
 #include "gl/gl_base.h"
 #include "bean/bean_base.h"
 #include "log.h"
 
-
-static const char gPicVertexShader[] =
+const char gPicVertexShader[] =
         "#version 300 es                                                    \n"
-                "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
-                "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
-                "out vec2 TexCoord;                                                 \n"
-                "uniform mat4 projection;                                           \n"
-                "uniform mat4 camera;                                               \n"
-                "uniform mat4 transform;                                            \n"
-                "void main() {                                                      \n"
-                "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
-                "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
-                "}\n";
+        "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
+        "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
+        "out vec2 TexCoord;                                                 \n"
+        "uniform mat4 projection;                                           \n"
+        "uniform mat4 camera;                                               \n"
+        "uniform mat4 transform;                                            \n"
+        "void main() {                                                      \n"
+        "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
+        "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
+        "}\n";
 
-static const char gPicFragmentShader[] =
+const char gPicFragmentShader[] =
         "#version 300 es                        \n"
-                "precision mediump float;               \n"
-                "in vec2 TexCoord;                      \n"
-                "uniform sampler2D tTexture;            \n"
-                "out vec4 color;                        \n"
-                "void main() {                          \n"
-                "  color = texture(tTexture, TexCoord); \n"
-                "}\n";
+        "precision mediump float;               \n"
+        "in vec2 TexCoord;                      \n"
+        "uniform sampler2D tTexture;            \n"
+        "out vec4 color;                        \n"
+        "void main() {                          \n"
+        "  color = texture(tTexture, TexCoord); \n"
+        "}\n";
 
 
 const Point3 A = {-0.5, 0.5, -1};

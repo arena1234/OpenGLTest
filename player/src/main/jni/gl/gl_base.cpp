@@ -62,7 +62,7 @@ GLuint GLBase::createProgram(const char *pVertexSource, const char *pFragmentSou
 
     GLuint pixelShader = loadShader(GL_FRAGMENT_SHADER, pFragmentSource);
     if (!pixelShader) {
-        LOGE("Picture:createProgramfragment shader fail");
+        LOGE("[GLBase:createProgram]fragment shader fail");
         return 0;
     }
 
@@ -131,6 +131,8 @@ void GLBase::prepareRenderer() {
             glBindVertexArray(0);
             checkGLError("glBindVertexArray -");
         }
+
+        glEnable(GL_DEPTH_TEST);
     }
 }
 
@@ -138,11 +140,6 @@ GLint GLBase::onSurfaceCreated() {
     updateBuffer();
     mShaderProgramHandle = loadShader();
     createTexture();
-
-    // 获取投影、Camera、变换句柄
-    mProjectionHandle = glGetUniformLocation(mShaderProgramHandle, "projection");
-    mCameraHandle = glGetUniformLocation(mShaderProgramHandle, "camera");
-    mTransformHandle = glGetUniformLocation(mShaderProgramHandle, "transform");
 
     GLuint size = mTexCoordBuffer->getSize();
     LOGD("[GLBase:onSurfaceCreated]VAO size = %d", size);

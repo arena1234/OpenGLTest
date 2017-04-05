@@ -2,7 +2,6 @@
 #define GL_BASE_H
 
 #include <GLES3/gl3.h>
-#include <GLES/glext.h>
 #include <android/bitmap.h>
 #include <stdio.h>
 #include <stdlib.h>
