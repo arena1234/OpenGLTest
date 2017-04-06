@@ -12,18 +12,18 @@ PicLight::~PicLight() {
 
 void PicLight::updateVertex() {
     LOGD("[Picture:updateVertex]");
-    mTexCoordBuffer->updateBuffer((GLfloat *) picTexCoords, sizeof(picTexCoords),
-                                  sizeof(picTexCoords[0]), 2);
+    mTexCoordBuffer->updateBuffer((GLfloat *) cubeTexCoords, sizeof(cubeTexCoords),
+                                  sizeof(cubeTexCoords[0]), 2);
 }
 
 void PicLight::updateTexCoord() {
     LOGD("[Picture:updateTexCoord]");
-    mVertexBuffer->updateBuffer((GLfloat *) picVertex, sizeof(picVertex),
-                                sizeof(picVertex[0]), 3);
+    mVertexBuffer->updateBuffer((GLfloat *) cubeVertex, sizeof(cubeVertex),
+                                sizeof(cubeVertex[0]), 3);
 }
 
 GLuint PicLight::loadShader() {
-    GLuint shaderHandle = createProgram(gPicVertexShader, gPicFragmentShader);
+    GLuint shaderHandle = createProgram(gCubeVertexShader, gCubeFragmentShader);
 
     // 获取投影、Camera、变换句柄
     mProjectionHandle = glGetUniformLocation(shaderHandle, "projection");
@@ -61,25 +61,29 @@ void PicLight::updateFrame(Bitmap *bmp) {
 //                        bmp->bitmapInfo.width, bmp->bitmapInfo.height,
 //                        GL_RGBA, GL_UNSIGNED_BYTE, bmp->pixels);
     }
-    for (GLuint i = 0; i < mVertexBuffer->getSize(); i++) {
-        // 绑定VAO，绑定之后开始绘制
-        glBindVertexArray(mVAO[i]);
-        checkGLError("glBindVertexArray +");
+    for(GLuint cubeCount = 0; cubeCount < sizeof(positions) / sizeof(positions[0]); cubeCount++) {
+        for (GLuint i = 0; i < mVertexBuffer->getSize(); i++) {
+            // 绑定VAO，绑定之后开始绘制
+            glBindVertexArray(mVAO[i]);
+            checkGLError("glBindVertexArray +");
 
-        // 投影、Camera、变换赋值
-        mMatrix->perspective(mTransformBean->fov, (GLfloat) mWindowWidth / (GLfloat) mWindowHeight,
-                             0.1,
-                             100);
-        mMatrix->setIdentity();
-        mMatrix->rotate(mTransformBean->degreeY, 1, 0, -3);
-        mMatrix->rotate(mTransformBean->degreeX, 0, 1, -3);
-        mMatrix->translate(0.0, 0.0, -3);
-        glUniformMatrix4fv(mProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
-        glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
-        glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
-        glDrawArrays(GL_TRIANGLES, 0, mVertexBuffer->getBuffer(i)->pointSize);
-        // 解绑VAO
-        glBindVertexArray(0);
-        checkGLError("glBindVertexArray -");
+            // 投影、Camera、变换赋值
+            mMatrix->perspective(mTransformBean->fov,
+                                 (GLfloat) mWindowWidth / (GLfloat) mWindowHeight,
+                                 0.1,
+                                 100);
+            mMatrix->setIdentity();
+            mMatrix->translate(positions[cubeCount][0], positions[cubeCount][1], positions[cubeCount][2]);
+            mMatrix->rotate(mTransformBean->degreeY, 1, 0, 0);
+            mMatrix->rotate(mTransformBean->degreeX, 0, 1, 0);
+            mMatrix->translate(positions[cubeCount][0], positions[cubeCount][1], positions[cubeCount][2]);
+            glUniformMatrix4fv(mProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
+            glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
+            glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, mVertexBuffer->getBuffer(i)->pointSize);
+            // 解绑VAO
+            glBindVertexArray(0);
+            checkGLError("glBindVertexArray -");
+        }
     }
 }
