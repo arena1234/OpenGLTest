@@ -15,30 +15,64 @@ const char gCubeVertexShader[] =
         "#version 300 es                                                    \n"
         "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
         "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
+        "layout (location = "STRV(SHADER_IN_NORMAL_VERTOR)") in vec3 normal;\n"
         "out vec2 TexCoord;                                                 \n"
+        "out vec3 FragPos;                                                  \n"
+        "out vec3 Normal;                                                   \n"
         "uniform mat4 projection;                                           \n"
         "uniform mat4 camera;                                               \n"
         "uniform mat4 transform;                                            \n"
         "void main() {                                                      \n"
         "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
         "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
+        "  FragPos = vec3(transform * vec4(position, 1.0));                 \n"
+        "  Normal = mat3(transpose(inverse(transform))) * normal;           \n"
         "}\n";
 
 const char gCubeFragmentShader[] =
         "#version 300 es                        \n"
         "precision mediump float;               \n"
         "in vec2 TexCoord;                      \n"
+        "in vec3 FragPos;                       \n"
+        "in vec3 Normal;                        \n"
         "uniform sampler2D tTexture;            \n"
-        "uniform vec3 lightColor;               \n"
+        "uniform vec3 objectPos;                \n"
         "out vec4 color;                        \n"
+        "struct Material {                      \n"
+        "  vec3 ambient;                        \n"
+        "  vec3 diffuse;                        \n"
+        "  vec3 specular;                       \n"
+        "  float shininess;                     \n"
+        "};                                     \n"
+        "struct Light {                         \n"
+        "  vec3 ambient;                        \n"
+        "  vec3 diffuse;                        \n"
+        "  vec3 specular;                       \n"
+        "  vec3 position;                       \n"
+        "};                                     \n"
+        "uniform Material material;             \n"
+        "uniform Light light;                   \n"
         "void main() {                          \n"
-        "  color = vec4(lightColor, 1) * texture(tTexture, TexCoord); \n"
-        "}\n";
+        // Ambient
+        "  vec3 ambient = light.ambient * material.ambient;\n"
+        // Diffuse
+        "  vec3 norm = normalize(Normal);                               \n"
+        "  vec3 lightDir = normalize(light.position - FragPos);         \n"
+        "  float diff = max(dot(norm, lightDir), 0.0);                  \n"
+        "  vec3 diffuse = light.diffuse * (diff * material.diffuse);    \n"
+        // Specular
+        "  vec3 objectDir = normalize(objectPos - FragPos);                             \n"
+        "  vec3 reflectDir = reflect(-objectDir, norm);                                 \n"
+        "  float spec = pow(max(dot(objectDir, reflectDir), 0.0), material.shininess);  \n"
+        "  vec3 specular =  light.specular * (spec * material.specular);                \n"
+        // result
+        "  vec3 result = (ambient + diffuse + specular);                \n"
+        "  color = vec4(result, 1) * texture(tTexture, TexCoord);       \n"
+        "}                                                              \n";
 
 const char gLightVertexShader[] =
         "#version 300 es                                                    \n"
         "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
-        "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
         "uniform mat4 projection;                                           \n"
         "uniform mat4 camera;                                               \n"
         "uniform mat4 transform;                                            \n"
@@ -138,6 +172,44 @@ const GLfloat cubeTexCoords[][8] = {
                 1.0, 1.0,
         },
 };
+const GLfloat normalVertex[][12] = {
+        {// 左
+                -1, 0, 0,
+                -1, 0, 0,
+                -1, 0, 0,
+                -1, 0, 0,
+        },
+        {// 前
+                0, 0, 1,
+                0, 0, 1,
+                0, 0, 1,
+                0, 0, 1,
+        },
+        {// 上
+                0, 1, 0,
+                0, 1, 0,
+                0, 1, 0,
+                0, 1, 0,
+        },
+        {// 下
+                0, -1, 0,
+                0, -1, 0,
+                0, -1, 0,
+                0, -1, 0,
+        },
+        {//右
+                1, 0, 0,
+                1, 0, 0,
+                1, 0, 0,
+                1, 0, 0,
+        },
+        {// 后
+                0, 0, -1,
+                0, 0, -1,
+                0, 0, -1,
+                0, 0, -1,
+        },
+};
 
 const GLfloat positions[][3] = {
         {
@@ -188,6 +260,10 @@ protected:
 
     GLuint loadShader();
 
+    void prepareRenderer();
+
+    void updateNormalVector();
+
 private:
     GLboolean bFirstFrame;
 
@@ -196,7 +272,18 @@ private:
     GLint mLightTransformHandle;        // 变换矩阵的句柄
     GLuint mShaderLightHandle;          // 着色器句柄
 
-    GLint mLightHandle;                 // 灯光句柄
+    GLint mLightAmbient;                // 灯光颜色句柄
+    GLint mLightDiffuse;                // 灯光颜色句柄
+    GLint mLightSpecular;               // 灯光颜色句柄
+    GLint mLightPosition;               // 灯光位置句柄
+    GLint mObjectPosition;              // 物体位置句柄
+
+    GLint mMaterialAmbient;             // 环境光
+    GLint mMaterialDiffuse;             // 漫反射
+    GLint mMaterialSpecular;            // 镜面反射
+    GLint mMaterialShininess;           // 高光半径
+
+    FloatBuffer *mNormalBuffer;     // 顶点坐标缓存
 
     void loadShaderForLight();
 };

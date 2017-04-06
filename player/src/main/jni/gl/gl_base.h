@@ -17,8 +17,9 @@
 
 #define STR(s) #s
 #define STRV(s) STR(s)
-#define SHADER_IN_POSITION      0
-#define SHADER_IN_TEX_COORDS    1
+#define SHADER_IN_POSITION          0
+#define SHADER_IN_TEX_COORDS        1
+#define SHADER_IN_NORMAL_VERTOR     2
 
 class GLBase {
 public:
@@ -60,6 +61,8 @@ protected:
     virtual void updateVertex() = 0;
 
     virtual void updateTexCoord() = 0;
+
+    virtual void updateNormalVector();
 
     virtual GLuint loadShader() = 0;
 

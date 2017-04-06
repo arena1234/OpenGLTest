@@ -94,8 +94,11 @@ GLuint GLBase::createProgram(const char *pVertexSource, const char *pFragmentSou
 void GLBase::updateBuffer() {
     updateTexCoord();
     updateVertex();
+    updateNormalVector();
     isUpdateBuffer = GL_TRUE;
 }
+
+void GLBase::updateNormalVector() { }
 
 void GLBase::prepareRenderer() {
     if (isUpdateBuffer) {
@@ -131,8 +134,6 @@ void GLBase::prepareRenderer() {
             glBindVertexArray(0);
             checkGLError("glBindVertexArray -");
         }
-
-        glEnable(GL_DEPTH_TEST);
     }
 }
 
@@ -144,11 +145,11 @@ GLint GLBase::onSurfaceCreated() {
     GLuint size = mTexCoordBuffer->getSize();
     LOGD("[GLBase:onSurfaceCreated]VAO size = %d", size);
     mVAO = (GLuint *) malloc(size * sizeof(GLuint));
-    mVBO = (GLuint *) malloc(size * 2 * sizeof(GLuint));
+    mVBO = (GLuint *) malloc(size * 3 * sizeof(GLuint));
     // 获取顶点数组对象VAO(Vertex Array Object)和顶点缓冲对象VBO(Vertex Buffer Objects)
     glGenVertexArrays(size, mVAO);
     checkGLError("glGenVertexArrays");
-    glGenBuffers(size * 2, mVBO);
+    glGenBuffers(size * 3, mVBO);
     checkGLError("glGenBuffers");
 
     return mTextureId[0];
