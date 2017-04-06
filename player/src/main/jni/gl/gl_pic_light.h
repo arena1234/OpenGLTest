@@ -33,7 +33,7 @@ const char gCubeFragmentShader[] =
         "void main() {                          \n"
         "  color = texture(tTexture, TexCoord); \n"
         "}\n";
-/*
+
 const Point3 A = {-0.5, 0.5, 0.5};
 const Point3 B = {-0.5, -0.5, 0.5};
 const Point3 C = {0.5, -0.5, 0.5};
@@ -117,7 +117,7 @@ const GLfloat cubeTexCoords[][8] = {
                 1.0, 0.0,
                 1.0, 1.0,
         },
-};*/
+};
 
 const GLfloat positions[][3] = {
         {
