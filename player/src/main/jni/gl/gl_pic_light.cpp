@@ -29,6 +29,9 @@ GLuint PicLight::loadShader() {
     mProjectionHandle = glGetUniformLocation(shaderHandle, "projection");
     mCameraHandle = glGetUniformLocation(shaderHandle, "camera");
     mTransformHandle = glGetUniformLocation(shaderHandle, "transform");
+    mLightHandle = glGetUniformLocation(shaderHandle, "lightColor");
+
+    loadShaderForLight();
     return shaderHandle;
 }
 
@@ -73,17 +76,55 @@ void PicLight::updateFrame(Bitmap *bmp) {
                                  0.1,
                                  100);
             mMatrix->setIdentity();
-            mMatrix->translate(positions[cubeCount][0], positions[cubeCount][1], positions[cubeCount][2]);
+//            mMatrix->translate(positions[cubeCount][0], positions[cubeCount][1], positions[cubeCount][2]);
             mMatrix->rotate(mTransformBean->degreeY, 1, 0, 0);
             mMatrix->rotate(mTransformBean->degreeX, 0, 1, 0);
             mMatrix->translate(positions[cubeCount][0], positions[cubeCount][1], positions[cubeCount][2]);
             glUniformMatrix4fv(mProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
             glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
             glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
+            glUniform3f(mLightHandle, 0.1, 0.1, 0.1);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, mVertexBuffer->getBuffer(i)->pointSize);
             // 解绑VAO
             glBindVertexArray(0);
             checkGLError("glBindVertexArray -");
         }
     }
+
+    // light
+    {
+        glUseProgram(mShaderLightHandle);
+        for (GLuint i = 0; i < mVertexBuffer->getSize(); i++) {
+            // 绑定VAO，绑定之后开始绘制
+            glBindVertexArray(mVAO[i]);
+            checkGLError("glBindVertexArray +");
+
+            // 投影、Camera、变换赋值
+            mMatrix->perspective(mTransformBean->fov,
+                                 (GLfloat) mWindowWidth / (GLfloat) mWindowHeight,
+                                 0.1,
+                                 100);
+            mMatrix->setIdentity();
+            mMatrix->translate(lightPosition[0], lightPosition[1], lightPosition[2]);
+//            mMatrix->rotate(mTransformBean->degreeY, 1, 0, 0);
+//            mMatrix->rotate(mTransformBean->degreeX, 0, 1, 0);
+//            mMatrix->translate(lightPosition[0], lightPosition[1], lightPosition[2]);
+            glUniformMatrix4fv(mLightProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
+            glUniformMatrix4fv(mLightCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
+            glUniformMatrix4fv(mLightTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, mVertexBuffer->getBuffer(i)->pointSize);
+            // 解绑VAO
+            glBindVertexArray(0);
+            checkGLError("glBindVertexArray -");
+        }
+    }
+}
+
+void PicLight::loadShaderForLight() {
+    mShaderLightHandle = createProgram(gLightVertexShader, gLightFragmentShader);
+
+    // 获取投影、Camera、变换句柄
+    mLightProjectionHandle = glGetUniformLocation(mShaderLightHandle, "projection");
+    mLightCameraHandle = glGetUniformLocation(mShaderLightHandle, "camera");
+    mLightTransformHandle = glGetUniformLocation(mShaderLightHandle, "transform");
 }

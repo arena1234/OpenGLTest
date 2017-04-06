@@ -29,9 +29,29 @@ const char gCubeFragmentShader[] =
         "precision mediump float;               \n"
         "in vec2 TexCoord;                      \n"
         "uniform sampler2D tTexture;            \n"
+        "uniform vec3 lightColor;               \n"
         "out vec4 color;                        \n"
         "void main() {                          \n"
-        "  color = texture(tTexture, TexCoord); \n"
+        "  color = vec4(lightColor, 1) * texture(tTexture, TexCoord); \n"
+        "}\n";
+
+const char gLightVertexShader[] =
+        "#version 300 es                                                    \n"
+        "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
+        "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
+        "uniform mat4 projection;                                           \n"
+        "uniform mat4 camera;                                               \n"
+        "uniform mat4 transform;                                            \n"
+        "void main() {                                                      \n"
+        "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
+        "}\n";
+
+const char gLightFragmentShader[] =
+        "#version 300 es                        \n"
+        "precision mediump float;               \n"
+        "out vec4 color;                        \n"
+        "void main() {                          \n"
+        "  color = vec4(1.0);                   \n"
         "}\n";
 
 const Point3 A = {-0.5, 0.5, 0.5};
@@ -121,9 +141,9 @@ const GLfloat cubeTexCoords[][8] = {
 
 const GLfloat positions[][3] = {
         {
-                0, 0, -2,
+                0, 0, -2.4,
         },
-        {
+        /*{
                 3,  0, -8,
         },
         {
@@ -146,8 +166,10 @@ const GLfloat positions[][3] = {
         },
         {
                 1, -1, -4,
-        },
+        },*/
 };
+
+const GLfloat lightPosition[3] = {8, 5, -12};
 
 class PicLight : public GLBase {
 public:
@@ -168,6 +190,15 @@ protected:
 
 private:
     GLboolean bFirstFrame;
+
+    GLint mLightProjectionHandle;       // 投影矩阵的句柄
+    GLint mLightCameraHandle;           // Camera矩阵的句柄
+    GLint mLightTransformHandle;        // 变换矩阵的句柄
+    GLuint mShaderLightHandle;          // 着色器句柄
+
+    GLint mLightHandle;                 // 灯光句柄
+
+    void loadShaderForLight();
 };
 
 #endif //GL_PIC_LIGHT_H
