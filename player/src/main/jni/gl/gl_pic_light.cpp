@@ -102,14 +102,14 @@ void PicLight::updateFrame(Bitmap *bmp) {
             glUniformMatrix4fv(mProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
             glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
             glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
-            glUniform3f(mLightAmbient, 0.2f, 0.2f, 0.2f);
-            glUniform3f(mLightDiffuse, 0.5f, 0.5f, 0.5f);// 让我们把这个光调暗一点，这样会看起来更自然
+            glUniform3f(mLightAmbient, 1.0f, 1.0f, 1.0f);
+            glUniform3f(mLightDiffuse, 1.0f, 1.0f, 1.0f);// 让我们把这个光调暗一点，这样会看起来更自然
             glUniform3f(mLightSpecular, 1.0f, 1.0f, 1.0f);
             glUniform3f(mLightPosition, lightPosition[0], lightPosition[1], lightPosition[2]);
             glUniform3f(mObjectPosition,
                         positions[cubeCount][0], positions[cubeCount][1], positions[cubeCount][2]);
-            glUniform3f(mMaterialAmbient, 1.0f, 0.5f, 0.31f);
-            glUniform3f(mMaterialDiffuse, 1.0f, 0.5f, 0.31f);
+            glUniform3f(mMaterialAmbient, 1.0f, 1.0f, 1.0f);
+            glUniform3f(mMaterialDiffuse, 1.0f, 1.0f, 1.0f);
             glUniform3f(mMaterialSpecular, 0.5f, 0.5f, 0.5f);
             glUniform1f(mMaterialShininess, 32.0f);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, mVertexBuffer->getBuffer(i)->pointSize);

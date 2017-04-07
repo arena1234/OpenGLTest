@@ -26,7 +26,7 @@ const char gCubeVertexShader[] =
         "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
         "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
         "  FragPos = vec3(transform * vec4(position, 1.0));                 \n"
-        "  Normal = mat3(transpose(inverse(transform))) * normal;           \n"
+        "  Normal = normal;           \n"
         "}\n";
 
 const char gCubeFragmentShader[] =
@@ -58,7 +58,7 @@ const char gCubeFragmentShader[] =
         // Diffuse
         "  vec3 norm = normalize(Normal);                               \n"
         "  vec3 lightDir = normalize(light.position - FragPos);         \n"
-        "  float diff = max(dot(norm, lightDir), 0.0);                  \n"
+        "  float diff = max(dot(norm, lightDir), 0.4);                  \n"
         "  vec3 diffuse = light.diffuse * (diff * material.diffuse);    \n"
         // Specular
         "  vec3 objectDir = normalize(objectPos - FragPos);                             \n"
@@ -66,7 +66,7 @@ const char gCubeFragmentShader[] =
         "  float spec = pow(max(dot(objectDir, reflectDir), 0.0), material.shininess);  \n"
         "  vec3 specular =  light.specular * (spec * material.specular);                \n"
         // result
-        "  vec3 result = (ambient + diffuse + specular);                \n"
+        "  vec3 result = (ambient + diffuse);                \n"
         "  color = vec4(result, 1) * texture(tTexture, TexCoord);       \n"
         "}                                                              \n";
 
@@ -215,33 +215,33 @@ const GLfloat positions[][3] = {
         {
                 0, 0, -2.4,
         },
-        /*{
-                3,  0, -8,
+        {
+                6,  0, -16,
         },
         {
-                -3,  0, -8,
+                -6,  0, -16,
         },
         {
-                0,  3, -8,
+                0,  6, -16,
         },
         {
-                0,  -3, -8,
+                0,  -6, -16,
         },
         {
-                -1, 1, -4,
+                -3, 3, -8,
         },
         {
-                -1, -1, -4,
+                -3, -3, -8,
         },
         {
-                1, 1, -4,
+                3, 3, -8,
         },
         {
-                1, -1, -4,
-        },*/
+                3, -3, -8,
+        },
 };
 
-const GLfloat lightPosition[3] = {8, 5, -12};
+const GLfloat lightPosition[3] = {8, 0, -12};
 
 class PicLight : public GLBase {
 public:

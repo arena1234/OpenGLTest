@@ -30,9 +30,10 @@ const char gVideoFragmentShader[] =
         "precision mediump float;               \n"
         "in vec2 TexCoord;                      \n"
         "uniform samplerExternalOES tTexture;   \n"
+        "uniform vec3 light;                    \n"
         "out vec4 color;                        \n"
         "void main() {                          \n"
-        "  color = texture(tTexture, TexCoord); \n"
+        "  color = vec4(light, 1.0) * texture(tTexture, TexCoord); \n"
         "}\n";
 
 

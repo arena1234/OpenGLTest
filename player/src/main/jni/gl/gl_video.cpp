@@ -27,6 +27,7 @@ GLuint Video::loadShader() {
     mProjectionHandle = glGetUniformLocation(shaderHandle, "projection");
     mCameraHandle = glGetUniformLocation(shaderHandle, "camera");
     mTransformHandle = glGetUniformLocation(shaderHandle, "transform");
+    mLightHandle = glGetUniformLocation(shaderHandle, "light");
     return shaderHandle;
 }
 
@@ -64,7 +65,7 @@ void Video::updateFrame(Bitmap *bmp) {
         glUniformMatrix4fv(mProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
         glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
         glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
-
+        glUniform3f(mLightHandle, mLight->x, mLight->y, mLight->z);
         // 绑定纹理,之后任何的纹理指令都可以配置当前绑定的纹理
         glActiveTexture(GL_TEXTURE0);
         checkGLError("glActiveTexture");

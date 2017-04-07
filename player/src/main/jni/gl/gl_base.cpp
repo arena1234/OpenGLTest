@@ -1,3 +1,4 @@
+#include <bean/bean_base.h>
 #include "gl/gl_base.h"
 
 GLBase::GLBase(TransformBean *transformBean) {
@@ -7,6 +8,8 @@ GLBase::GLBase(TransformBean *transformBean) {
     mTexCoordBuffer = new FloatBuffer();
     mVertexBuffer = new FloatBuffer();
     mMatrix = new Matrix();
+    mLight = new Point3();
+    updateLight(1.0);
 }
 
 GLBase::~GLBase() {
@@ -16,6 +19,7 @@ GLBase::~GLBase() {
     delete mTexCoordBuffer;
     delete mVertexBuffer;
     delete mMatrix;
+    delete mLight;
     LOGD("[GLBase] -");
 }
 
@@ -94,11 +98,14 @@ GLuint GLBase::createProgram(const char *pVertexSource, const char *pFragmentSou
 void GLBase::updateBuffer() {
     updateTexCoord();
     updateVertex();
-    updateNormalVector();
     isUpdateBuffer = GL_TRUE;
 }
 
-void GLBase::updateNormalVector() { }
+void GLBase ::updateLight(GLfloat light) {
+    mLight->x = light;
+    mLight->y = light;
+    mLight->z = light;
+}
 
 void GLBase::prepareRenderer() {
     if (isUpdateBuffer) {
@@ -145,11 +152,11 @@ GLint GLBase::onSurfaceCreated() {
     GLuint size = mTexCoordBuffer->getSize();
     LOGD("[GLBase:onSurfaceCreated]VAO size = %d", size);
     mVAO = (GLuint *) malloc(size * sizeof(GLuint));
-    mVBO = (GLuint *) malloc(size * 3 * sizeof(GLuint));
+    mVBO = (GLuint *) malloc(size * 2 * sizeof(GLuint));
     // 获取顶点数组对象VAO(Vertex Array Object)和顶点缓冲对象VBO(Vertex Buffer Objects)
     glGenVertexArrays(size, mVAO);
     checkGLError("glGenVertexArrays");
-    glGenBuffers(size * 3, mVBO);
+    glGenBuffers(size * 2, mVBO);
     checkGLError("glGenBuffers");
 
     return mTextureId[0];

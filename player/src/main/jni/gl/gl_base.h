@@ -38,15 +38,17 @@ protected:
     FloatBuffer *mVertexBuffer;     // 顶点坐标缓存
     FloatBuffer *mTexCoordBuffer;   // 纹理坐标缓存
     Matrix *mMatrix;                // 矩阵(投影、变换、Camera)
-    GLint mProjectionHandle;       // 投影矩阵的句柄
-    GLint mCameraHandle;           // Camera矩阵的句柄
-    GLint mTransformHandle;        // 变换矩阵的句柄
+    GLint mProjectionHandle;        // 投影矩阵的句柄
+    GLint mCameraHandle;            // Camera矩阵的句柄
+    GLint mTransformHandle;         // 变换矩阵的句柄
+    GLint mLightHandle;            // 变换矩阵的句柄
     GLuint mShaderProgramHandle;    // 着色器句柄
     GLuint *mTextureId;             // 纹理ID
     GLuint *mVBO;
     GLuint *mVAO;
     GLuint mWindowWidth;
     GLuint mWindowHeight;
+    Point3 *mLight;
 
     GLboolean isUpdateBuffer;
 
@@ -62,7 +64,7 @@ protected:
 
     virtual void updateTexCoord() = 0;
 
-    virtual void updateNormalVector();
+    virtual void updateLight(GLfloat light);
 
     virtual GLuint loadShader() = 0;
 

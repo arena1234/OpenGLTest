@@ -1,3 +1,4 @@
+#include <bean/bean_base.h>
 #include "gl/gl_picture.h"
 
 Picture::Picture(TransformBean *transformBean)
@@ -29,6 +30,7 @@ GLuint Picture::loadShader() {
     mProjectionHandle = glGetUniformLocation(shaderHandle, "projection");
     mCameraHandle = glGetUniformLocation(shaderHandle, "camera");
     mTransformHandle = glGetUniformLocation(shaderHandle, "transform");
+    mLightHandle = glGetUniformLocation(shaderHandle, "light");
     return shaderHandle;
 }
 
@@ -78,6 +80,7 @@ void Picture::updateFrame(Bitmap *bmp) {
         glUniformMatrix4fv(mProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
         glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
         glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
+        glUniform3f(mLightHandle, mLight->x, mLight->y, mLight->z);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, mVertexBuffer->getBuffer(i)->pointSize);
         // 解绑VAO
         glBindVertexArray(0);
