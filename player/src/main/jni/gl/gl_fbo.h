@@ -50,7 +50,7 @@ const char gFboVertexShader[] =
         "#version 300 es                                                    \n"
                 "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
                 "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
-//                "out vec2 TexCoord;                                                 \n"
+                "out vec2 TexCoord;                                                 \n"
 //                "uniform mat4 projection;                                           \n"
 //                "uniform mat4 camera;                                               \n"
 //                "uniform mat4 transform;                                            \n"
@@ -192,6 +192,7 @@ protected:
     GLint mLightHandle;             // 变换矩阵的句柄
     GLuint mShaderProgramHandle;    // 着色器句柄
     GLuint *mTextureId;             // 纹理ID
+    GLuint *mFboTextureId;             // 纹理ID
     GLuint *mVBO;
     GLuint *mVAO;
     GLuint mWindowWidth;
@@ -225,13 +226,16 @@ private :
     void updateBuffer();
 
     GLboolean bFirstFrame;
-    GLint mFboProjectionHandle;        // 投影矩阵的句柄
-    GLint mFboCameraHandle;            // Camera矩阵的句柄
-    GLint mFboTransformHandle;         // 变换矩阵的句柄
+    GLboolean bSecondFrame;
+//    GLint mFboProjectionHandle;        // 投影矩阵的句柄
+//    GLint mFboCameraHandle;            // Camera矩阵的句柄
+//    GLint mFboTransformHandle;         // 变换矩阵的句柄
     GLuint mFboShaderProgramHandle;    // 着色器句柄
 
     GLuint *mFboVBO;
     GLuint *mFboVAO;
+
+    GLuint *mFboId;
 };
 
 #endif //GL_FBO_H

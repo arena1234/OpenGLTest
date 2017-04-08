@@ -3,7 +3,9 @@
 GLFbo::GLFbo(TransformBean *transformBean) {
     LOGD("[GLBase] +");
     bFirstFrame = true;
-    mTextureId = (GLuint *) malloc(1 * sizeof(GLuint));
+    bSecondFrame = false;
+    mTextureId = (GLuint *) malloc(2 * sizeof(GLuint));
+    mFboId = (GLuint *) malloc(1 * sizeof(GLuint));
     mTransformBean = transformBean;
     mTexCoordBuffer = new FloatBuffer();
     mVertexBuffer = new FloatBuffer();
@@ -13,6 +15,7 @@ GLFbo::GLFbo(TransformBean *transformBean) {
 }
 
 GLFbo::~GLFbo() {
+    glDeleteFramebuffers(1, mFboId);
     free(mTextureId);
     free(mVBO);
     free(mVAO);
@@ -137,7 +140,7 @@ GLuint GLFbo::loadShader() {
 }
 
 void GLFbo::createTexture() {
-    glGenTextures(1, mTextureId);
+    glGenTextures(2, mTextureId);
     checkGLError("glGenTextures");
     // 绑定纹理,之后任何的纹理指令都可以配置当前绑定的纹理
     glBindTexture(GL_TEXTURE_2D, mTextureId[0]);
@@ -150,6 +153,20 @@ void GLFbo::createTexture() {
     // 纹理剩余位置显示处理
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+
+    glBindTexture(GL_TEXTURE_2D, mTextureId[1]);
+    // 纹理过滤
+    // GL_NEAREST 当前像素值
+    // GL_LINEAR 当前像素附近颜色的混合色
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 纹理剩余位置显示处理
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+                 1280, 720, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
 }
 
 void GLFbo::updateFrame(Bitmap *bmp) {
@@ -232,14 +249,14 @@ GLint GLFbo::onSurfaceCreated() {
     // 获取顶点数组对象VAO(Vertex Array Object)和顶点缓冲对象VBO(Vertex Buffer Objects)
     glGenVertexArrays(size, mVAO);
     checkGLError("glGenVertexArrays");
-    glGenBuffers(size * 3, mVBO);
+    glGenBuffers(size * 2, mVBO);
     checkGLError("glGenBuffers");
 
     mFboVAO = (GLuint *) malloc(sizeof(GLuint));
     mFboVBO = (GLuint *) malloc(2 * sizeof(GLuint));
-    glGenVertexArrays(size, mFboVAO);
+    glGenVertexArrays(1, mFboVAO);
     checkGLError("glGenVertexArrays");
-    glGenBuffers(size * 3, mFboVBO);
+    glGenBuffers(2, mFboVBO);
     checkGLError("glGenBuffers");
 
     return mTextureId[0];
@@ -253,6 +270,22 @@ void GLFbo::onSurfaceChanged(int w, int h) {
     glViewport(0, 0, w, h);
     checkGLError("glViewport");
 
+
+    glGenFramebuffers(1, mFboId);
+    glBindFramebuffer(GL_FRAMEBUFFER, mFboId[0]);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureId[1], 0);
+
+    GLuint rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, mWindowWidth, mWindowHeight);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if (GLuint result = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        LOGE("[onSurfaceCreated] glCheckFramebufferStatus is fail 0x%x", result);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //    glEnable(GL_BLEND);
 //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -261,12 +294,25 @@ void GLFbo::onDrawFrame(Bitmap *bmp) {
     prepareRenderer();
     if (bFirstFrame && bmp != NULL) {
         bFirstFrame = false;
+        bSecondFrame = true;
+        glBindTexture(GL_TEXTURE_2D, mTextureId[0]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                      bmp->bitmapInfo.width, bmp->bitmapInfo.height, 0,
                      GL_RGBA, GL_UNSIGNED_BYTE, bmp->pixels);
         checkGLError("glTexImage2D");
+//        return;
+//    }
+//
+//    if (bSecondFrame && bmp != NULL) {
+//        bSecondFrame = false;
+//        glBindTexture(GL_TEXTURE_2D, mTextureId[1]);
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+//                     bmp->bitmapInfo.width, bmp->bitmapInfo.height, 0,
+//                     GL_RGBA, GL_UNSIGNED_BYTE, bmp->pixels);
+//        checkGLError("glTexImage2D");
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, mFboId[0]);
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -275,7 +321,7 @@ void GLFbo::onDrawFrame(Bitmap *bmp) {
     for (GLuint i = 0; i < mVertexBuffer->getSize(); i++) {
         // 绑定VAO，绑定之后开始绘制
         glBindVertexArray(mVAO[i]);
-        checkGLError("glBindVertexArray +");
+        checkGLError("glBindVertexArray qqq +");
 
         // 投影、Camera、变换赋值
         mMatrix->perspective(mTransformBean->fov, (GLfloat) mWindowWidth / (GLfloat) mWindowHeight,
@@ -290,30 +336,36 @@ void GLFbo::onDrawFrame(Bitmap *bmp) {
         glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
         glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
         glUniform3f(mLightHandle, mLight->x, mLight->y, mLight->z);
+        glBindTexture(GL_TEXTURE_2D, mTextureId[0]);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, mVertexBuffer->getBuffer(i)->pointSize);
         // 解绑VAO
         glBindVertexArray(0);
-        checkGLError("glBindVertexArray -");
+        checkGLError("glBindVertexArray qqq -");
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(mFboShaderProgramHandle);
-    //for (GLuint i = 0; i < mVertexBuffer->getSize(); i++) {
+    {
         // 绑定VAO，绑定之后开始绘制
         glBindVertexArray(mFboVAO[0]);
-        checkGLError("glBindVertexArray +");
+        checkGLError("glBindVertexArray www +");
 
         // 投影、Camera、变换赋值
-        mMatrix->perspective(mTransformBean->fov, (GLfloat) mWindowWidth / (GLfloat) mWindowHeight,
-                             0.1,
-                             100);
-        mMatrix->setIdentity();
-        mMatrix->translate(8, 0, -12);
+//        mMatrix->perspective(mTransformBean->fov, (GLfloat) mWindowWidth / (GLfloat) mWindowHeight,
+//                             0.1,
+//                             100);
+//        mMatrix->setIdentity();
+//        mMatrix->translate(8, 0, -12);
 //        glUniformMatrix4fv(mProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
 //        glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
 //        glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
+        glBindTexture(GL_TEXTURE_2D, mTextureId[1]);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         // 解绑VAO
         glBindVertexArray(0);
-        checkGLError("glBindVertexArray -");
-    //}
+        checkGLError("glBindVertexArray www -");
+    }
 }
