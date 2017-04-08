@@ -35,29 +35,29 @@ const char gPicFragmentShader[] =
         "}\n";
 
 
-const Point3 A = {-0.5, 0.5, -1};
-const Point3 B = {-0.5, -0.5, -1};
-const Point3 C = {0.5, -0.5, -1};
-const Point3 D = {0.5, 0.5, -1};
-const Point3 E = {-0.5, 0.5, -2};
-const Point3 F = {-0.5, -0.5, -2};
-const Point3 G = {0.5, -0.5, -2};
-const Point3 H = {0.5, 0.5, -2};
+const Point3 A = {-0.5, 0.5, 0.5};
+const Point3 B = {-0.5, -0.5, 0.5};
+const Point3 C = {0.5, -0.5, 0.5};
+const Point3 D = {0.5, 0.5, 0.5};
+const Point3 E = {-0.5, 0.5, -0.5};
+const Point3 F = {-0.5, -0.5, -0.5};
+const Point3 G = {0.5, -0.5, -0.5};
+const Point3 H = {0.5, 0.5, -0.5};
 
 const GLfloat picVertex[][12] = {
-        /*{// 左
+        {// 左
                 F.x, F.y, F.z,
                 E.x, E.y, E.z,
                 B.x, B.y, B.z,
                 A.x, A.y, A.z,
-        },*/
+        },
         {// 前
                 B.x, B.y, B.z,
                 A.x, A.y, A.z,
                 C.x, C.y, C.z,
                 D.x, D.y, D.z,
         },
-        /*{// 上
+        {// 上
                 A.x, A.y, A.z,
                 E.x, E.y, E.z,
                 D.x, D.y, D.z,
@@ -80,7 +80,7 @@ const GLfloat picVertex[][12] = {
                 H.x, H.y, H.z,
                 F.x, F.y, F.z,
                 E.x, E.y, E.z,
-        },*/
+        },
 };
 const GLfloat picTexCoords[][8] = {
         {
@@ -89,12 +89,6 @@ const GLfloat picTexCoords[][8] = {
                 1.0, 0.0,
                 1.0, 1.0,
         },
-        /*{
-                0.0, 0.0,
-                0.0, 1.0,
-                1.0, 0.0,
-                1.0, 1.0,
-        },
         {
                 0.0, 0.0,
                 0.0, 1.0,
@@ -118,7 +112,13 @@ const GLfloat picTexCoords[][8] = {
                 0.0, 1.0,
                 1.0, 0.0,
                 1.0, 1.0,
-        },*/
+        },
+        {
+                0.0, 0.0,
+                0.0, 1.0,
+                1.0, 0.0,
+                1.0, 1.0,
+        },
 };
 
 class Picture : public GLBase {

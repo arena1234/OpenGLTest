@@ -41,7 +41,7 @@ protected:
     GLint mProjectionHandle;        // 投影矩阵的句柄
     GLint mCameraHandle;            // Camera矩阵的句柄
     GLint mTransformHandle;         // 变换矩阵的句柄
-    GLint mLightHandle;            // 变换矩阵的句柄
+    GLint mLightHandle;             // 变换矩阵的句柄
     GLuint mShaderProgramHandle;    // 着色器句柄
     GLuint *mTextureId;             // 纹理ID
     GLuint *mVBO;

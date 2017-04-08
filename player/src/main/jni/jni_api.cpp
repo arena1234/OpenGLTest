@@ -1,6 +1,6 @@
 #include "jni_api.h"
 
-GLBase *mGLBase = NULL;
+GLFbo *mGLBase = NULL;
 Transform *mTransform = NULL;
 Bean *mBean = NULL;
 Bitmap *mBitmap = NULL;
@@ -53,9 +53,9 @@ void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeInitApi(JNIEnv *env,
     mTransform = new Transform(mBean->getTransformBean());
     mBitmap = new Bitmap();
     if (pictureMode) {
-        mGLBase = new Picture(mBean->getTransformBean());
+        mGLBase = new GLFbo(mBean->getTransformBean());
     } else {
-        mGLBase = new Video(mBean->getTransformBean());
+        //mGLBase = new Video(mBean->getTransformBean());
     }
 }
 

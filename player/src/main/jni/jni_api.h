@@ -3,7 +3,7 @@
 
 #include <jni.h>
 #include "gl/gl_base.h"
-#include "gl/gl_picture.h"
+#include "gl/gl_fbo.h"
 #include "gl/gl_video.h"
 #include "bean/bean.h"
 #include "transform/transform.h"

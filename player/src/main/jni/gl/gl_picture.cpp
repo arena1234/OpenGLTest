@@ -1,4 +1,3 @@
-#include <bean/bean_base.h>
 #include "gl/gl_picture.h"
 
 Picture::Picture(TransformBean *transformBean)
@@ -74,9 +73,10 @@ void Picture::updateFrame(Bitmap *bmp) {
                              0.1,
                              100);
         mMatrix->setIdentity();
+//        mMatrix->translate(0, 0, -1.5);
         mMatrix->rotate(mTransformBean->degreeY, 1, 0, 0);
         mMatrix->rotate(mTransformBean->degreeX, 0, 1, 0);
-        //mMatrix->translate(0.5, 0.5, 0);
+        mMatrix->translate(0, 0, -1.5);
         glUniformMatrix4fv(mProjectionHandle, 1, GL_FALSE, mMatrix->getProjectionMatrix());
         glUniformMatrix4fv(mCameraHandle, 1, GL_FALSE, mMatrix->getCameraMatrix());
         glUniformMatrix4fv(mTransformHandle, 1, GL_FALSE, mMatrix->getTransformMatrix());
