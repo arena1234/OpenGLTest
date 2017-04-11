@@ -58,10 +58,6 @@ typedef struct {
             delete pVertexBuffer;
             pVertexBuffer = NULL;
         }
-        if (pTransformBean != NULL) {
-            delete pTransformBean;
-            pTransformBean = NULL;
-        }
         if (pMatrix != NULL) {
             delete pMatrix;
             pMatrix = NULL;
@@ -77,29 +73,29 @@ typedef struct {
     }
 } GLBean;
 
-const char gFboVertexShader[] =
+const char gRectVertexShader[] =
         "#version 300 es                                                    \n"
-                "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
-                "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
-                "out vec2 TexCoord;                                                 \n"
-//                "uniform mat4 projection;                                           \n"
-//                "uniform mat4 camera;                                               \n"
-//                "uniform mat4 transform;                                            \n"
-                "void main() {                                                      \n"
-//                "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
-                "  gl_Position = vec4(position, 1.0);   \n"
-                "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
-                "}\n";
+        "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
+        "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
+        "out vec2 TexCoord;                                                 \n"
+//        "uniform mat4 projection;                                           \n"
+//        "uniform mat4 camera;                                               \n"
+//        "uniform mat4 transform;                                            \n"
+        "void main() {                                                      \n"
+//        "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
+        "  gl_Position = vec4(position, 1.0);   \n"
+        "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
+        "}\n";
 
-const char gFboFragmentShader[] =
+const char gRectFragmentShader[] =
         "#version 300 es                        \n"
-                "precision mediump float;               \n"
-                "in vec2 TexCoord;                      \n"
-                "uniform sampler2D tTexture;            \n"
-                "out vec4 color;                        \n"
-                "void main() {                          \n"
-                "  color = texture(tTexture, TexCoord); \n"
-                "}\n";
+        "precision mediump float;               \n"
+        "in vec2 TexCoord;                      \n"
+        "uniform sampler2D tTexture;            \n"
+        "out vec4 color;                        \n"
+        "void main() {                          \n"
+        "  color = texture(tTexture, TexCoord); \n"
+        "}\n";
 
 const GLfloat rectVertex[][12] = {
         {

@@ -7,7 +7,6 @@ Bitmap *mBitmap = NULL;
 
 jint JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnSurfaceCreated(JNIEnv *env,
                                                                       jobject obj) {
-    LOGD("[jni_api]onSurfaceCreated");
     return mGLDisplay->onSurfaceCreated();
 }
 
@@ -15,7 +14,6 @@ void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnSurfaceChanged(JNIEnv *en
                                                                       jobject obj,
                                                                       jint width,
                                                                       jint height) {
-    LOGD("[jni_api]onSurfaceChanged");
     mGLDisplay->onSurfaceChanged(width, height);
 }
 

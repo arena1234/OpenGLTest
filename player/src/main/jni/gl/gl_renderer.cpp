@@ -1,6 +1,7 @@
 #include "gl/gl_renderer.h"
 
 GLRenderer::GLRenderer(TransformBean *bean) {
+    LOGD("[GLRenderer] +");
     pBeanProcess = new GLBean();
     pBeanProcess->init();
     pBeanProcess->pTransformBean = bean;
@@ -9,15 +10,16 @@ GLRenderer::GLRenderer(TransformBean *bean) {
 }
 
 GLRenderer::~GLRenderer() {
+    glDeleteFramebuffers(1, &mFBOId);
     pBeanProcess->clear();
     delete pBeanProcess;
     pBeanDisplay->clear();
     delete pBeanDisplay;
-
-    glDeleteFramebuffers(1, &mFBOId);
+    LOGD("[GLRenderer] -");
 }
 
 GLint GLRenderer::onSurfaceCreated() {
+    LOGD("[GLRenderer:onSurfaceCreated]");
     prepareProcessBuffer();
     prepareDisplayBuffer();
     loadShader();
@@ -30,33 +32,28 @@ GLint GLRenderer::onSurfaceCreated() {
 
     // 创建VAO、VBO
     GLuint size = pBeanProcess->pVertexBuffer->getSize();
-    LOGD("[GLBase:onSurfaceCreated]VAO size = %d", size);
     pBeanProcess->pVAO = (GLuint *) malloc(size * sizeof(GLuint));
     pBeanProcess->pVBO = (GLuint *) malloc(size * 2 * sizeof(GLuint));
     // 获取顶点数组对象VAO(Vertex Array Object)和顶点缓冲对象VBO(Vertex Buffer Objects)
     glGenVertexArrays(size, pBeanProcess->pVAO);
-    checkGLError("glGenVertexArrays");
     glGenBuffers(size * 2, pBeanProcess->pVBO);
-    checkGLError("glGenBuffers");
 
     size = pBeanDisplay->pVertexBuffer->getSize();
     pBeanDisplay->pVAO = (GLuint *) malloc(size * sizeof(GLuint));
     pBeanDisplay->pVBO = (GLuint *) malloc(size * 2 * sizeof(GLuint));
     glGenVertexArrays(size, pBeanDisplay->pVAO);
-    checkGLError("glGenVertexArrays");
     glGenBuffers(size * 2, pBeanDisplay->pVBO);
-    checkGLError("glGenBuffers");
 
     return pBeanProcess->mTextureId;
 }
 
 void GLRenderer::onSurfaceChanged(GLuint w, GLuint h) {
+    LOGD("[GLRenderer:onSurfaceChanged]view size(%d, %d)", w, h);
     mWindowWidth = w;
     mWindowHeight = h;
     pBeanProcess->pMatrix->perspective(45, (GLfloat) w / (GLfloat) h, 0.1, 100);
     pBeanProcess->pMatrix->lookAt(0, 0, 0, 0, 0, -1, 0, 1, 0);
     glViewport(0, 0, w, h);
-    checkGLError("glViewport");
     configTexture(mWindowWidth, mWindowHeight);
 
     prepareFBO();
@@ -71,19 +68,18 @@ void GLRenderer::onDrawFrame(Bitmap *bmp) {
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glUseProgram(pBeanProcess->mProgramHandle);
     draw(pBeanProcess);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-//    glUseProgram(pBeanDisplay->mProgramHandle);
     draw(pBeanDisplay);
 }
 
 void GLRenderer::loadShader() {
-    pBeanDisplay->mProgramHandle = createProgram(gFboVertexShader, gFboFragmentShader);
+    pBeanDisplay->mProgramHandle = createProgram(gRectVertexShader, gRectFragmentShader);
+    LOGD("[GLRenderer:loadShader]pBeanDisplay->mProgramHandle=%d", pBeanDisplay->mProgramHandle);
 }
 
 void GLRenderer::configTexture(GLuint w, GLuint h) {
@@ -112,6 +108,7 @@ void GLRenderer::configTexture(GLuint w, GLuint h) {
 }
 
 void GLRenderer::prepareDisplayBuffer() {
+    LOGD("[GLRenderer:prepareDisplayBuffer]");
     pBeanDisplay->pTextureBuffer->updateBuffer((GLfloat *) rectTexture, sizeof(rectTexture),
                                                sizeof(rectTexture[0]), 2);
     pBeanDisplay->pVertexBuffer->updateBuffer((GLfloat *) rectVertex, sizeof(rectVertex),
@@ -128,33 +125,27 @@ void GLRenderer::updateBuffer(GLBean *glBean) {
         for (GLuint i = 0; i < glBean->pVertexBuffer->getSize(); i++) {
             // 绑定VAO，绑定之后设置顶点坐标相关的值
             glBindVertexArray(glBean->pVAO[i]);
-            checkGLError("glBindVertexArray +");
+            checkGLError("updateBuffer glBindVertexArray +");
             // 绑定顶点坐标并设置顶点坐标
             glBindBuffer(GL_ARRAY_BUFFER, glBean->pVBO[i * 2 + 0]);
-            checkGLError("glBindBuffer for vertex");
             glBufferData(GL_ARRAY_BUFFER, glBean->pVertexBuffer->getBuffer(i)->bufferSize,
                          glBean->pVertexBuffer->getBuffer(i)->buffer, GL_DYNAMIC_DRAW);
-            checkGLError("glBufferData for vertex");
             // 设置顶点属性指针
             glVertexAttribPointer(SHADER_IN_POSITION, 3, GL_FLOAT, GL_FALSE,
                                   3 * sizeof(GLfloat), (GLvoid *) 0);
-            checkGLError("glVertexAttribPointer");
             glEnableVertexAttribArray(SHADER_IN_POSITION);
-            checkGLError("glEnableVertexAttribArray");
 
             // 绑定纹理坐标并设置纹理坐标
             glBindBuffer(GL_ARRAY_BUFFER, glBean->pVBO[i * 2 + 1]);
-            checkGLError("glBindBuffer for texture");
             glBufferData(GL_ARRAY_BUFFER, glBean->pTextureBuffer->getBuffer(i)->bufferSize,
                          glBean->pTextureBuffer->getBuffer(i)->buffer, GL_DYNAMIC_DRAW);
-            checkGLError("glBufferData for texture");
             // 设置纹理属性指针
             glVertexAttribPointer(SHADER_IN_TEX_COORDS, 2, GL_FLOAT, GL_FALSE,
                                   2 * sizeof(GLfloat), (GLvoid *) 0);
             glEnableVertexAttribArray(SHADER_IN_TEX_COORDS);
             // 解绑VAO
             glBindVertexArray(0);
-            checkGLError("glBindVertexArray -");
+            checkGLError("updateBuffer glBindVertexArray -");
         }
     }
 }
@@ -174,7 +165,7 @@ void GLRenderer::prepareFBO() {
 
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (result != GL_FRAMEBUFFER_COMPLETE) {
-        LOGE("[GLRenderer:prepareFBO] glCheckFramebufferStatus is fail 0x%x", result);
+        LOGE("[GLRenderer:prepareFBO] glCheckFramebufferStatus is fail(0x%x)", result);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -187,7 +178,7 @@ void GLRenderer::draw(GLBean *glBean) {
     for (GLuint i = 0; i < glBean->pVertexBuffer->getSize(); i++) {
         // 绑定VAO，绑定之后开始绘制
         glBindVertexArray(glBean->pVAO[i]);
-        checkGLError("glBindVertexArray +");
+        checkGLError("draw glBindVertexArray +");
 
         // 投影、Camera、变换赋值
         if (glBean->pTransformBean != NULL) {
@@ -218,6 +209,6 @@ void GLRenderer::draw(GLBean *glBean) {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, glBean->pVertexBuffer->getBuffer(i)->pointSize);
         // 解绑VAO
         glBindVertexArray(0);
-        checkGLError("glBindVertexArray -");
+        checkGLError("draw glBindVertexArray -");
     }
 }

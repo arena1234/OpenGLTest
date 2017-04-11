@@ -22,9 +22,11 @@ void Video::loadShader() {
     pBeanProcess->mLightHandle = glGetUniformLocation(pBeanProcess->mProgramHandle,
                                                       "light");
     pBeanProcess->eTextureTarget = GL_TEXTURE_EXTERNAL_OES;
+    LOGD("[Video:loadShader]pBeanProcess->mProgramHandle=%d", pBeanProcess->mProgramHandle);
 }
 
 void Video::prepareProcessBuffer() {
+    LOGD("[GLRenderer:prepareProcessBuffer]");
     pBeanProcess->pTextureBuffer->updateBuffer((GLfloat *) videoTexture, sizeof(videoTexture),
                                                sizeof(videoTexture[0]), 2);
     pBeanProcess->pVertexBuffer->updateBuffer((GLfloat *) videoVertex, sizeof(videoVertex),
