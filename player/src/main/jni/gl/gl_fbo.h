@@ -192,7 +192,6 @@ protected:
     GLint mLightHandle;             // 变换矩阵的句柄
     GLuint mShaderProgramHandle;    // 着色器句柄
     GLuint *mTextureId;             // 纹理ID
-    GLuint *mFboTextureId;             // 纹理ID
     GLuint *mVBO;
     GLuint *mVAO;
     GLuint mWindowWidth;

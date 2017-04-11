@@ -2,8 +2,8 @@
 
 GLFbo::GLFbo(TransformBean *transformBean) {
     LOGD("[GLBase] +");
-    bFirstFrame = true;
-    bSecondFrame = false;
+    bFirstFrame = GL_TRUE;
+    bSecondFrame = GL_FALSE;
     mTextureId = (GLuint *) malloc(2 * sizeof(GLuint));
     mFboId = (GLuint *) malloc(1 * sizeof(GLuint));
     mTransformBean = transformBean;

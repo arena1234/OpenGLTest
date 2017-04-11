@@ -13,6 +13,7 @@ LOCAL_SRC_FILES     :=  file/file.cpp               \
                         bean/float_buffer.cpp       \
                         gl/gl_matrix.cpp            \
                         gl/gl_base.cpp              \
+                        gl/gl_renderer.cpp          \
                         gl/gl_fbo.cpp               \
                         gl/gl_picture.cpp           \
                         gl/gl_video.cpp             \

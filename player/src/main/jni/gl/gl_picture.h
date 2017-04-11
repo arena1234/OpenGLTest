@@ -6,43 +6,43 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "gl/gl_base.h"
+#include "gl/gl_renderer.h"
+#include "gl/gl_bitmap.h"
 #include "bean/bean_base.h"
 #include "log.h"
 
 const char gPicVertexShader[] =
         "#version 300 es                                                    \n"
-        "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
-        "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
-        "out vec2 TexCoord;                                                 \n"
-        "uniform mat4 projection;                                           \n"
-        "uniform mat4 camera;                                               \n"
-        "uniform mat4 transform;                                            \n"
-        "void main() {                                                      \n"
-        "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
-        "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
-        "}\n";
+                "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
+                "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
+                "out vec2 TexCoord;                                                 \n"
+                "uniform mat4 projection;                                           \n"
+                "uniform mat4 camera;                                               \n"
+                "uniform mat4 transform;                                            \n"
+                "void main() {                                                      \n"
+                "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
+                "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
+                "}\n";
 
 const char gPicFragmentShader[] =
         "#version 300 es                        \n"
-        "precision mediump float;               \n"
-        "in vec2 TexCoord;                      \n"
-        "uniform sampler2D tTexture;            \n"
-        "uniform vec3 light;                    \n"
-        "out vec4 color;                        \n"
-        "void main() {                          \n"
-        "  color = vec4(light, 1.0) * texture(tTexture, TexCoord); \n"
-        "}\n";
+                "precision mediump float;               \n"
+                "in vec2 TexCoord;                      \n"
+                "uniform sampler2D tTexture;            \n"
+                "uniform vec3 light;                    \n"
+                "out vec4 color;                        \n"
+                "void main() {                          \n"
+                "  color = vec4(light, 1.0) * texture(tTexture, TexCoord); \n"
+                "}\n";
 
-
-const Point3 A = {-0.5, 0.5, 0.5};
-const Point3 B = {-0.5, -0.5, 0.5};
-const Point3 C = {0.5, -0.5, 0.5};
-const Point3 D = {0.5, 0.5, 0.5};
-const Point3 E = {-0.5, 0.5, -0.5};
-const Point3 F = {-0.5, -0.5, -0.5};
-const Point3 G = {0.5, -0.5, -0.5};
-const Point3 H = {0.5, 0.5, -0.5};
+const Point3 A = {-0.5, 0.5, -1};
+const Point3 B = {-0.5, -0.5, -1};
+const Point3 C = {0.5, -0.5, -1};
+const Point3 D = {0.5, 0.5, -1};
+const Point3 E = {-0.5, 0.5, -2};
+const Point3 F = {-0.5, -0.5, -2};
+const Point3 G = {0.5, -0.5, -2};
+const Point3 H = {0.5, 0.5, -2};
 
 const GLfloat picVertex[][12] = {
         {// 左
@@ -82,7 +82,7 @@ const GLfloat picVertex[][12] = {
                 E.x, E.y, E.z,
         },
 };
-const GLfloat picTexCoords[][8] = {
+const GLfloat picTexture[][8] = {
         {
                 0.0, 0.0,
                 0.0, 1.0,
@@ -121,22 +121,18 @@ const GLfloat picTexCoords[][8] = {
         },
 };
 
-class Picture : public GLBase {
+class Picture : public GLRenderer {
 public:
-    Picture(TransformBean *transformBean);
+    Picture(TransformBean *bean);
 
     ~Picture();
 
 protected:
-    void updateFrame(Bitmap *bmp);
+    void loadShader();
 
-    void createTexture();
+    void prepareProcessBuffer();
 
-    void updateVertex();
-
-    void updateTexCoord();
-
-    GLuint loadShader();
+    void prepareDraw(Bitmap *bmp);
 
 private:
     GLboolean bFirstFrame;

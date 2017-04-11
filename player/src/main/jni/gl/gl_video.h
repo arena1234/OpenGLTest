@@ -3,11 +3,9 @@
 
 #include <GLES3/gl3.h>
 #include <GLES/glext.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
-#include "gl/gl_base.h"
+#include "gl/gl_renderer.h"
 #include "bean/bean_base.h"
 #include "log.h"
 
@@ -57,7 +55,7 @@ const GLfloat videoVertex[][12] = {
                 2,   0.5, -1,
         },
 };
-const GLfloat videoTexCoords[][8] = {
+const GLfloat videoTexture[][8] = {
         {
                 0.0, 0.0,
                 0.0, 1.0,
@@ -78,22 +76,16 @@ const GLfloat videoTexCoords[][8] = {
         },
 };
 
-class Video : public GLBase {
+class Video : public GLRenderer {
 public:
     Video(TransformBean *transformBean);
 
     ~Video();
 
 protected:
-    void updateFrame(Bitmap *bmp);
+    void loadShader();
 
-    void createTexture();
-
-    void updateVertex();
-
-    void updateTexCoord();
-
-    GLuint loadShader();
+    void prepareProcessBuffer();
 };
 
 #endif //GL_VIDEO_H

@@ -1,6 +1,6 @@
 #include "jni_api.h"
 
-GLFbo *mGLBase = NULL;
+GLRenderer *mGLDisplay = NULL;
 Transform *mTransform = NULL;
 Bean *mBean = NULL;
 Bitmap *mBitmap = NULL;
@@ -8,7 +8,7 @@ Bitmap *mBitmap = NULL;
 jint JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnSurfaceCreated(JNIEnv *env,
                                                                       jobject obj) {
     LOGD("[jni_api]onSurfaceCreated");
-    return mGLBase->onSurfaceCreated();
+    return mGLDisplay->onSurfaceCreated();
 }
 
 void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnSurfaceChanged(JNIEnv *env,
@@ -16,7 +16,7 @@ void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnSurfaceChanged(JNIEnv *en
                                                                       jint width,
                                                                       jint height) {
     LOGD("[jni_api]onSurfaceChanged");
-    mGLBase->onSurfaceChanged(width, height);
+    mGLDisplay->onSurfaceChanged(width, height);
 }
 
 void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnDrawFrame(JNIEnv *env,
@@ -40,9 +40,9 @@ void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnDrawFrame(JNIEnv *env,
         }
         AndroidBitmap_unlockPixels(env, bmp);
         mBitmap->bitmapInfo = bitmapInfo;
-        mGLBase->onDrawFrame(mBitmap);
+        mGLDisplay->onDrawFrame(mBitmap);
     } else {
-        mGLBase->onDrawFrame(NULL);
+        mGLDisplay->onDrawFrame(NULL);
     }
 }
 
@@ -53,17 +53,17 @@ void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeInitApi(JNIEnv *env,
     mTransform = new Transform(mBean->getTransformBean());
     mBitmap = new Bitmap();
     if (pictureMode) {
-        mGLBase = new GLFbo(mBean->getTransformBean());
+        mGLDisplay = new Picture(mBean->getTransformBean());
     } else {
-        //mGLBase = new Video(mBean->getTransformBean());
+        mGLDisplay = new Video(mBean->getTransformBean());
     }
 }
 
 void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeReleaseApi(JNIEnv *env,
                                                                 jobject obj) {
     LOGD("[jni_api]release");
-    if (mGLBase != NULL) {
-        delete mGLBase;
+    if (mGLDisplay != NULL) {
+        delete mGLDisplay;
     }
     if (mTransform != NULL) {
         delete mTransform;
