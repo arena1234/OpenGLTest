@@ -3,8 +3,8 @@
 
 #include <GLES3/gl3.h>
 
-#define TO_DEGREES(a)       (a) * 180 / M_PI
-#define TO_RADIANS(a)       (a) / 180 * M_PI
+#define TO_DEGREES(a)       (a) * 180.0 / M_PI
+#define TO_RADIANS(a)       (a) / 180.0 * M_PI
 
 static const GLfloat FOV_MIN = 20;
 static const GLfloat FOV_MAX = 70;

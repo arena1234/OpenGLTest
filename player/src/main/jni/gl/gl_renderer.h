@@ -12,13 +12,9 @@
 #include "bean/bean_base.h"
 #include "bean/float_buffer.h"
 
-#define STR(s) #s
-#define STRV(s) STR(s)
-#define SHADER_IN_POSITION          0
-#define SHADER_IN_TEX_COORDS        1
-
 typedef struct {
     FloatBuffer *pVertexBuffer;         // 顶点坐标缓存
+    FloatBuffer *pVertexEndBuffer;      // 顶点坐标缓存
     FloatBuffer *pTextureBuffer;        // 纹理坐标缓存
     TransformBean *pTransformBean;      // 移动旋转等数据
     Matrix *pMatrix;                    // 矩阵(投影、变换、Camera)
@@ -27,15 +23,18 @@ typedef struct {
     GLint mCameraHandle;                // Camera矩阵的句柄
     GLint mTransformHandle;             // 变换矩阵的句柄
     GLint mLightHandle;                 // 变换矩阵的句柄
+    GLint mAnimHandle;                  // 变换矩阵的句柄
     GLuint mTextureId;                  //
     GLboolean bUpdateBuffer;
     GLenum eTextureTarget;
+    GLfloat mAnimFrameCount;
 
     GLuint *pVBO;
     GLuint *pVAO;
 
     void init() {
         pVertexBuffer = new FloatBuffer();
+        pVertexEndBuffer = new FloatBuffer();
         pTextureBuffer = new FloatBuffer();
         pTransformBean = NULL;
         pMatrix = new Matrix();
@@ -44,6 +43,8 @@ typedef struct {
         mCameraHandle = -1;
         mTransformHandle = -1;
         mLightHandle = -1;
+        mAnimHandle = -1;
+        mAnimFrameCount = 0;
         mTextureId = 0;
         eTextureTarget = GL_TEXTURE_2D;
         pVBO = NULL;
@@ -58,6 +59,10 @@ typedef struct {
         if (pVertexBuffer != NULL) {
             delete pVertexBuffer;
             pVertexBuffer = NULL;
+        }
+        if (pVertexEndBuffer != NULL) {
+            delete pVertexEndBuffer;
+            pVertexEndBuffer = NULL;
         }
         if (pMatrix != NULL) {
             delete pMatrix;
@@ -101,14 +106,8 @@ const char gRectFragmentShader[] =
 const GLfloat rectVertex[][12] = {
         {
                 -1, -1, 0.5,
-                -1, 0, 0.5,
-                0, -1, 0.5,
-                0, 0, 0.5,
-        },
-        {
-                0,  0,  0.5,
-                0,  1, 0.5,
-                1, 0,  0.5,
+                -1, 1, 0.5,
+                1, -1, 0.5,
                 1, 1, 0.5,
         }
 };
@@ -118,13 +117,7 @@ const GLfloat rectTexture[][8] = {
                 0.0, 1.0,
                 1.0, 0.0,
                 1.0, 1.0,
-        },
-        {
-                0.0, 0.0,
-                0.0, 1.0,
-                1.0, 0.0,
-                1.0, 1.0,
-        },
+        }
 };
 
 class GLRenderer : public GLBase {

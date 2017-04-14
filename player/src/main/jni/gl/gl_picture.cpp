@@ -1,12 +1,15 @@
 #include "gl/gl_picture.h"
+#include "gl_renderer.h"
 
 Picture::Picture(TransformBean *bean) : GLRenderer(bean) {
     LOGD("[Picture] +");
     bFirstFrame = GL_TRUE;
+    pShape = new Shape();
 }
 
 Picture::~Picture() {
     LOGD("[Picture] -");
+    delete pShape;
 }
 
 void Picture::loadShader() {
@@ -21,16 +24,27 @@ void Picture::loadShader() {
                                                           "transform");
     pBeanProcess->mLightHandle = glGetUniformLocation(pBeanProcess->mProgramHandle,
                                                       "light");
+    pBeanProcess->mAnimHandle = glGetUniformLocation(pBeanProcess->mProgramHandle,
+                                                      "anim");
     LOGD("[Picture:loadShader]pBeanProcess->mProgramHandle=%d", pBeanProcess->mProgramHandle);
 
 }
 
 void Picture::prepareProcessBuffer() {
     LOGD("[GLRenderer:prepareProcessBuffer]");
-    pBeanProcess->pTextureBuffer->updateBuffer((GLfloat *) picTexture, sizeof(picTexture),
-                                               sizeof(picTexture[0]), 2);
-    pBeanProcess->pVertexBuffer->updateBuffer((GLfloat *) picVertex, sizeof(picVertex),
-                                              sizeof(picVertex[0]), 3);
+    pShape->cylinder();
+    pBeanProcess->pTextureBuffer->updateBuffer(pShape->textureBuffer,
+                                               pShape->textureSize,
+                                               pShape->textureSize,
+                                               POINT_SIZE_TEXTURE);
+    pBeanProcess->pVertexBuffer->updateBuffer(pShape->vertexBufferStart,
+                                              pShape->vertexSize,
+                                              pShape->vertexSize,
+                                              POINT_SIZE_VERTEX);
+    pBeanProcess->pVertexEndBuffer->updateBuffer(pShape->vertexBufferEnd,
+                                              pShape->vertexSize,
+                                              pShape->vertexSize,
+                                              POINT_SIZE_VERTEX);
     pBeanProcess->bUpdateBuffer = GL_TRUE;
 }
 

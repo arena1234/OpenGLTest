@@ -8,7 +8,8 @@
 #define STR(s) #s
 #define STRV(s) STR(s)
 #define SHADER_IN_POSITION          0
-#define SHADER_IN_TEX_COORDS        1
+#define SHADER_IN_POSITION_END      1
+#define SHADER_IN_TEX_COORDS        2
 
 class GLBase {
 public:

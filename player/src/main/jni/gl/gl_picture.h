@@ -8,22 +8,42 @@
 
 #include "gl/gl_renderer.h"
 #include "gl/gl_bitmap.h"
+#include "gl/gl_shape.h"
 #include "bean/bean_base.h"
 #include "log.h"
 
 const char gPicVertexShader[] =
         "#version 300 es                                                    \n"
         "layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
+        "layout (location = "STRV(SHADER_IN_POSITION_END)") in vec3 pos_e;  \n"
         "layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
         "out vec2 TexCoord;                                                 \n"
         "uniform mat4 projection;                                           \n"
         "uniform mat4 camera;                                               \n"
         "uniform mat4 transform;                                            \n"
+        "uniform vec3 anim;                                                 \n"
+        "vec3 curr_pos;                                                     \n"
         "void main() {                                                      \n"
-        "  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
+        "  curr_pos = position*(1.0-anim.x) + pos_e*anim.x;   \n"
+        "  gl_Position = projection*camera*transform*vec4(curr_pos, 1.0);   \n"
         "  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
         "}\n";
 
+//"#version 300 es                                                    \n"
+//"layout (location = "STRV(SHADER_IN_POSITION)") in vec3 position;   \n"
+//"layout (location = "STRV(SHADER_IN_POSITION_END)") in vec3 pos_e;  \n"
+//"layout (location = "STRV(SHADER_IN_TEX_COORDS)") in vec2 texCoord; \n"
+//"out vec2 TexCoord;                                                 \n"
+//"uniform mat4 projection;                                           \n"
+//"uniform mat4 camera;                                               \n"
+//"uniform mat4 transform;                                            \n"
+//"uniform vec3 anim;                                                 \n"
+//"vec3 curr_pos;                                                     \n"
+//"void main() {                                                      \n"
+//"  curr_pos = position*(1-anim.x/anim.y) + pos_e*(anim.x/anim.y);   \n"
+//"  gl_Position = projection*camera*transform*vec4(position, 1.0);   \n"
+//"  TexCoord = vec2(texCoord.s, 1.0-texCoord.t);                     \n"
+//"}\n";
 const char gPicFragmentShader[] =
         "#version 300 es                        \n"
         "precision mediump float;               \n"
@@ -136,6 +156,7 @@ protected:
 
 private:
     GLboolean bFirstFrame;
+    Shape *pShape;
 };
 
 #endif //GL_PICTURE_H

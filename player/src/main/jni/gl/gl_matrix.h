@@ -36,6 +36,8 @@ public:
 
     void translate(GLfloat x, GLfloat y, GLfloat z);
 
+    void multiply(GLfloat *result, GLfloat *lhs, GLfloat *fhs);
+
 private:
     GLfloat *mProjectionMatrix;   // 投影矩阵
     GLfloat *mCameraMatrix;       // 摄像机矩阵

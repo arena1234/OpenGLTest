@@ -15,7 +15,7 @@ Transform::~Transform() {
 void Transform::setDefaultRegion() {
     mRegion->setDefaultFov(FOV_MIN, FOV_MIN, FOV_DEFAULT);
     mRegion->setDefaultX(0, 0, 0);
-    mRegion->setDefaultY(0, 0, 0);
+    mRegion->setDefaultY(0, 0, 30);
     mRegion->setDefaultZ(0, 0, 0);
     reset();
 }

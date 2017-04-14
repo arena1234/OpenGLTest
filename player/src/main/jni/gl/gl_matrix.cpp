@@ -272,3 +272,7 @@ void Matrix::translate(GLfloat x, GLfloat y, GLfloat z) {
     _multiply(mTransformMatrix, tmpMatrix, mTransformMatrix);
     free(tmpMatrix);
 }
+
+void Matrix::multiply(GLfloat *result, GLfloat *lhs, GLfloat *rhs) {
+    _multiply(result, lhs, rhs);
+}
