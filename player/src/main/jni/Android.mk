@@ -3,7 +3,7 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 #opencv
-include $(LOCAL_PATH)/native/jni/OpenCV.mk
+include $(LOCAL_PATH)/open_cv/lib/native/jni/OpenCV.mk
 OPENCV_CAMERA_MODULES:=off
 OPENCV_INSTALL_MODULES:=on
 OPENCV_LIB_TYPE:=STATIC
@@ -12,7 +12,7 @@ LOCAL_MODULE        := libplayer_jni
 LOCAL_CFLAGS        := -Werror
 
 LOCAL_C_INCLUDES    :=  $(LOCAL_PATH)               \
-                        $(LOCAL_PATH)/open_cv_include
+                        $(LOCAL_PATH)/open_cv/include
 LOCAL_SRC_FILES     :=  file/file.cpp               \
                         transform/touch.cpp         \
                         transform/sensor.cpp        \
