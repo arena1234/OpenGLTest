@@ -1,9 +1,15 @@
+#include <android/bitmap.h>
 #include "jni_api.h"
+#include "opencv2/opencv.hpp"
 
+extern "C" {
 GLRenderer *mGLDisplay = NULL;
 Transform *mTransform = NULL;
 Bean *mBean = NULL;
 Bitmap *mBitmap = NULL;
+
+using namespace cv;
+using namespace std;
 
 jint JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnSurfaceCreated(JNIEnv *env,
                                                                       jobject obj) {
@@ -38,6 +44,10 @@ void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnDrawFrame(JNIEnv *env,
         }
         AndroidBitmap_unlockPixels(env, bmp);
         mBitmap->bitmapInfo = bitmapInfo;
+        Mat srcImage(bitmapInfo.width, bitmapInfo.height, CV_8UC4, (unsigned char*)mBitmap->pixels);
+        Mat grayImage;
+        cvtColor(srcImage, grayImage, COLOR_BGRA2GRAY);
+        cvtColor(grayImage, srcImage, COLOR_GRAY2BGRA);
         mGLDisplay->onDrawFrame(mBitmap);
     } else {
         mGLDisplay->onDrawFrame(NULL);
@@ -90,4 +100,5 @@ jboolean JNICALL Java_com_wq_player_ndk_NdkPicture_nativeOnTouch(JNIEnv *env,
 void JNICALL Java_com_wq_player_ndk_NdkPicture_nativeResetTransform(JNIEnv *env,
                                                                     jobject obj) {
     mTransform->reset();
+}
 }
