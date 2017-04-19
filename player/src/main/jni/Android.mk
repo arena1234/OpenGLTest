@@ -4,6 +4,9 @@ include $(CLEAR_VARS)
 
 #opencv
 include $(LOCAL_PATH)/native/jni/OpenCV.mk
+OPENCV_CAMERA_MODULES:=off
+OPENCV_INSTALL_MODULES:=on
+OPENCV_LIB_TYPE:=STATIC
 
 LOCAL_MODULE        := libplayer_jni
 LOCAL_CFLAGS        := -Werror
